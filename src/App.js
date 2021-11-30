@@ -1,57 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import * as d3 from 'd3';
-import useData from './plugins/useData';
 
 // svg 設定
 const width = '1200';
 const height = '650';
-const margin = { top: 20, right: 20, bottom: 70, left: 80 };
+const margin = { top: 20, right: 20, bottom: 50, left: 140 };
 const innerHeight = height - margin.top - margin.bottom;
 const innerWidth = width - margin.left - margin.right;
 
 export default function App() {
-  // 資料
-  const data = useData();
-  // 選項
-  const xOption = 'timestamp';
-  const yOption = 'temperature';
-  // 圖表設定
-  const xValue = data.map((item) => item[xOption]);
-  const yValue = data.map((item) => item[yOption]);
-  const xScale = d3.scaleTime().domain(d3.extent(xValue)).range([0, innerWidth]);
-  const yScale = d3.scaleLinear().domain(d3.extent(yValue)).range([innerHeight, 0]).nice();
-  // 產生 XY 軸線
-  d3.select('.axis_bottom').call(d3.axisBottom(xScale).tickFormat(d3.timeFormat('%m/%d %H%p')));
-  d3.select('.axis_left').call(d3.axisLeft(yScale));
-  // 畫線
-  const line = d3
-    .line()
-    .x((d) => xScale(d[xOption]))
-    .y((d) => yScale(d[yOption]))
-    .curve(d3.curveNatural);
+  // data
+  const [data, setData] = useState([]);
+  // mounted
+  useEffect(() => {
+    getData();
+  }, []);
+  // watch
+  useEffect(() => {
+    if (!data.length) return;
+    const svg = d3.select('svg');
+    const g = svg.append('g').attr('id', 'maingroup').attr('transform', `translate(${margin.left},${margin.top})`);
+    const xScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, (d) => +d['2020'])])
+      .range([0, innerWidth]);
+    const yScale = d3
+      .scaleBand()
+      .domain(data.map((d) => d.Country))
+      .range([0, innerHeight])
+      .padding(0.1);
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+    g.append('g').call(xAxis).attr('transform', `translate(0,${innerHeight})`);
+    g.append('g').call(yAxis);
+    g.selectAll('rect')
+      .data(data, (d) => d.Country)
+      .enter()
+      .append('rect')
+      .attr('width', (d) => xScale(+d['2020']))
+      .attr('height', yScale.bandwidth())
+      .attr('fill', 'skyblue')
+      .attr('y', (d) => yScale(d.Country));
+    setTimeout(() => {
+      g.selectAll('rect')
+        .data(data, (d) => d.Country)
+        .transition()
+        .duration(800)
+        .attr('width', (d) => xScale(+d['1950']));
+    }, 1000);
+  }, [data]);
+  // methods
+  async function getData() {
+    const res = await d3.csv(
+      'https://gist.githubusercontent.com/curran/0ac4077c7fc6390f5dd33bf5c06cb5ff/raw/605c54080c7a93a417a3cea93fd52e7550e76500/UN_Population_2019.csv'
+    );
+    setData(res.slice(0, 10));
+  }
   // template
-  return (
-    <svg width={width} height={height}>
-      <g transform={`translate(${margin.left},${margin.top})`}>
-        <path d={line(data)} fill='none' stroke='black' strokeWidth='5' strokeLinejoin='round' strokeLinecap='round'></path>
-        <g className='axis_bottom' transform={`translate(0,${innerHeight})`}></g>
-        <g className='axis_left'></g>
-        <ChartLabel xOption={xOption} yOption={yOption} />
-      </g>
-    </svg>
-  );
-}
-
-// XY 軸線標籤
-function ChartLabel({ xOption, yOption }) {
-  return (
-    <>
-      <text style={{ fontSize: '24px' }} textAnchor='middle' transform={`translate(${innerWidth / 2},${innerHeight + 60})`}>
-        {xOption}
-      </text>
-      <text style={{ fontSize: '24px' }} textAnchor='middle' transform={`translate(-40,${innerHeight / 2}) rotate(-90)`}>
-        {yOption}
-      </text>
-    </>
-  );
+  return <svg width={width} height={height}></svg>;
 }
