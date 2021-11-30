@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import * as d3 from 'd3';
 
-const csvUrl = 'https://gist.githubusercontent.com/curran/0ac4077c7fc6390f5dd33bf5c06cb5ff/raw/UN_Population_2019.csv';
+const csvUrl = 'https://gist.githubusercontent.com/curran/a08a1080b88344b0c8a7/raw/0e7a9b0a5d22642a06d3d5b9bcbad9890c8ee534/iris.csv';
 
 export default function useData() {
   const [data, setData] = useState([]);
   useEffect(() => {
-    d3.csv(csvUrl, (data) => {
-      data.Populaton2020 = Number(data['2020']);
+    d3.csv(csvUrl, (data, index) => {
+      data.petal_length = +data.petal_length;
+      data.petal_width = +data.petal_width;
+      data.sepal_length = +data.sepal_length;
+      data.sepal_width = +data.sepal_width;
+      data.id = index;
       return data;
     }).then((res) => {
-      setData(res.slice(0, 10));
+      setData(res);
     });
   }, []);
   return data;
