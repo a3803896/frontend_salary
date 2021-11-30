@@ -1,57 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import * as d3 from 'd3';
 import useData from './plugins/useData';
 
+// svg 設定
 const width = '1200';
-const height = '600';
-const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+const height = '650';
+const margin = { top: 20, right: 20, bottom: 70, left: 80 };
 const innerHeight = height - margin.top - margin.bottom;
 const innerWidth = width - margin.left - margin.right;
 
 export default function App() {
+  // 資料
   const data = useData();
-  const [setosa, setSetosa] = useState([]);
-  const [versicolor, setVersicolor] = useState([]);
-  const [virginica, setVirginica] = useState([]);
-  const xChoose = 'sepal_length';
-  const yChoose = 'sepal_width';
-  const xValue = data.map((item) => item[xChoose]);
-  const yValue = data.map((item) => item[yChoose]);
-  const xScale = d3.scaleLinear().domain(d3.extent(xValue)).range([0, innerWidth]).nice();
-  const yScale = d3.scaleLinear().domain(d3.extent(yValue)).range([0, innerHeight]);
-  d3.select('.axis_bottom').call(d3.axisBottom(xScale));
+  // 選項
+  const xOption = 'timestamp';
+  const yOption = 'temperature';
+  // 圖表設定
+  const xValue = data.map((item) => item[xOption]);
+  const yValue = data.map((item) => item[yOption]);
+  const xScale = d3.scaleTime().domain(d3.extent(xValue)).range([0, innerWidth]);
+  const yScale = d3.scaleLinear().domain(d3.extent(yValue)).range([innerHeight, 0]).nice();
+  // 產生 XY 軸線
+  d3.select('.axis_bottom').call(d3.axisBottom(xScale).tickFormat(d3.timeFormat('%m/%d %H%p')));
   d3.select('.axis_left').call(d3.axisLeft(yScale));
-  useEffect(() => {
-    if (!data) return;
-    setSetosa(data.filter((d) => d.species === 'setosa'));
-    setVersicolor(data.filter((d) => d.species === 'versicolor'));
-    setVirginica(data.filter((d) => d.species === 'virginica'));
-  }, [data]);
+  // 畫線
+  const line = d3
+    .line()
+    .x((d) => xScale(d[xOption]))
+    .y((d) => yScale(d[yOption]))
+    .curve(d3.curveNatural);
+  // template
   return (
     <svg width={width} height={height}>
       <g transform={`translate(${margin.left},${margin.top})`}>
-        <g className='setosa'>
-          {setosa.map((d) => (
-            <Dot key={d.id} d={d} fill='#783B3C' xChoose={xChoose} yChoose={yChoose} xScale={xScale} yScale={yScale} />
-          ))}
-        </g>
-        <g className='versicolor'>
-          {versicolor.map((d) => (
-            <Dot key={d.id} d={d} fill='#20988E' xChoose={xChoose} yChoose={yChoose} xScale={xScale} yScale={yScale} />
-          ))}
-        </g>
-        <g className='virginica'>
-          {virginica.map((d) => (
-            <Dot key={d.id} d={d} fill='#CEB146' xChoose={xChoose} yChoose={yChoose} xScale={xScale} yScale={yScale} />
-          ))}
-        </g>
-        <g className='axis_bottom' transform={`translate(0,${innerHeight + 10})`}></g>
+        <path d={line(data)} fill='none' stroke='black' strokeWidth='5' strokeLinejoin='round' strokeLinecap='round'></path>
+        <g className='axis_bottom' transform={`translate(0,${innerHeight})`}></g>
         <g className='axis_left'></g>
+        <ChartLabel xOption={xOption} yOption={yOption} />
       </g>
     </svg>
   );
 }
 
-function Dot({ d, fill, xScale, yScale, xChoose, yChoose }) {
-  return <circle cx={xScale(d[xChoose])} cy={yScale(d[yChoose])} r='4' stroke={fill} strokeWidth='2' fill='transparent' opacity='0.8' />;
+// XY 軸線標籤
+function ChartLabel({ xOption, yOption }) {
+  return (
+    <>
+      <text style={{ fontSize: '24px' }} textAnchor='middle' transform={`translate(${innerWidth / 2},${innerHeight + 60})`}>
+        {xOption}
+      </text>
+      <text style={{ fontSize: '24px' }} textAnchor='middle' transform={`translate(-40,${innerHeight / 2}) rotate(-90)`}>
+        {yOption}
+      </text>
+    </>
+  );
 }
