@@ -5,12 +5,6 @@ export default function App() {
   // data
   let innerWidth;
   let innerHeight;
-  const [rawData] = useState([
-    { month: new Date('2018-1-1'), apples: 100, bananas: 200, oranges: 150 },
-    { month: new Date('2018-2-1'), apples: 150, bananas: 150, oranges: 150 },
-    { month: new Date('2018-3-1'), apples: 200, bananas: 250, oranges: 150 },
-    { month: new Date('2018-4-1'), apples: 250, bananas: 300, oranges: 150 },
-  ]);
   const [data, setData] = useState(null);
   // mounted
   useEffect(() => {
@@ -27,42 +21,52 @@ export default function App() {
   }, [data]);
   function draw() {
     const g = renderInit();
-    const maxValue = d3.max(data, (d) => d3.max(d, (sub) => sub[1]));
-    const xScale = d3
-      .scaleBand()
-      .domain(rawData.map((d) => d.month))
-      .range([0, innerWidth])
-      .padding(0.33);
-    const yScale = d3.scaleLinear().domain([0, maxValue]).range([innerHeight, 0]).nice();
-    const colorScale = d3
-      .scaleOrdinal()
-      .domain(data.map((d) => d.key))
-      .range(d3.schemeSet3);
-    const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat('%Y/%m')).tickSize(-innerHeight).tickPadding(10);
-    const yAxis = d3.axisLeft(yScale).tickSize(-innerWidth).tickPadding(10);
-    g.append('g').attr('class', 'x-axis').attr('transform', `translate(0,${innerHeight})`).call(xAxis);
-    g.append('g').attr('class', 'y-axis').call(yAxis);
-    // 第一層
-    g.selectAll('datagroup')
-      .data(data)
-      .enter()
-      .append('g')
-      .attr('class', 'datagroup')
-      .attr('fill', (d) => colorScale(d.key))
-      // 第二層
-      .selectAll('datarect')
-      .data((d) => d)
-      .enter()
-      .append('rect')
-      .attr('class', 'datarect')
-      .attr('x', (sub) => xScale(sub.data.month))
-      .attr('y', (sub) => yScale(sub[1]))
-      .attr('width', xScale.bandwidth())
-      .attr('height', (d) => yScale(d[0]) - yScale(d[1]));
+    const tree = d3.tree().size([innerHeight, innerWidth])(data);
+    const colorScale = d3.scaleOrdinal().range(d3.schemeCategory10);
+    // 畫線
+    g.selectAll('path')
+      .data(tree.links())
+      .join('path')
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+      .attr(
+        'd',
+        d3
+          .linkHorizontal()
+          .x((d) => d.y)
+          .y((d) => d.x)
+      );
+    // 畫點
+    g.selectAll('circle')
+      .data(tree.descendants())
+      .join('circle')
+      .attr('cx', (d) => d.y)
+      .attr('cy', (d) => d.x)
+      .attr('r', '4')
+      .attr('fill', (d) => {
+        if (d.depth === 0) return colorScale(d.data.name);
+        let tempD = d;
+        while (tempD.depth > 1) tempD = tempD.parent;
+        return colorScale(tempD.data.name);
+      });
+    // 寫字
+    g.selectAll('text')
+      .data(tree.descendants())
+      .join('text')
+      .attr('x', (d) => {
+        if (d.height === 0) return d.y + 6;
+        return d.y - 6;
+      })
+      .attr('y', (d) => d.x + 4)
+      .attr('text-anchor', (d) => {
+        if (d.height === 0) return 'start';
+        return 'end';
+      })
+      .text((d) => d.data.name);
   }
   function renderInit() {
     d3.select('.wrap svg').remove();
-    const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+    const margin = { top: 20, right: 50, bottom: 20, left: 50 };
     const width = parseInt(d3.select('.wrap').style('width'));
     const height = width * 0.5;
     innerWidth = width - margin.left - margin.right;
@@ -72,9 +76,9 @@ export default function App() {
     return g;
   }
   async function getData() {
-    const stack = d3.stack().keys(['apples', 'bananas', 'oranges']).order(d3.stackOrderNone);
-    const nativeStack = stack(rawData);
-    setData(nativeStack);
+    const res = await d3.json('https://raw.githubusercontent.com/Shao-Kui/D3.js-Demos/master/static/data/games.json');
+    const hierarchy = d3.hierarchy(res);
+    setData(hierarchy);
   }
   // template
   return <div className='wrap'></div>;
