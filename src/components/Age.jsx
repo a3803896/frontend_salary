@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as d3 from 'd3';
 
-export default function Area({ originData }) {
+export default function Age({ originData }) {
   // data
   let innerWidth;
   let innerHeight;
@@ -21,79 +21,74 @@ export default function Area({ originData }) {
   }, [data]);
   // methods
   function formatData() {
-    const tempData = {};
+    const tempObj = {};
     const data = [];
-    const res = originData;
-    res.forEach((item) => {
-      if (!item.company.area.includes('台灣')) return;
-      item.company.area = item.company.area.replace('台灣 - ', '');
-      if (!tempData[item.company.area]) tempData[item.company.area] = [];
-      tempData[item.company.area].push(item);
+    originData.forEach((item) => {
+      if (!tempObj[item.age]) tempObj[item.age] = [];
+      tempObj[item.age].push(item);
     });
-    for (let key in tempData) {
-      data.push({ area: key, amount: tempData[key].length });
+    for (let key in tempObj) {
+      data.push({ key, value: tempObj[key].length });
     }
-    data.sort((a, b) => b.amount - a.amount);
     setData(data);
   }
   function draw() {
     const g = renderInit();
     const xScale = d3
       .scaleBand()
-      .domain(data.map((d) => d.area))
+      .domain(data.map((d) => d.key))
       .range([0, innerWidth])
       .padding(0.15);
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(data, (d) => d.amount)])
+      .domain([0, d3.max(data, (d) => d.value)])
       .range([innerHeight, 0])
       .nice();
     const colorScale = d3
       .scaleOrdinal()
-      .domain(data.map((d) => d.area))
-      .range(d3.schemePastel1);
+      .domain(data.map((d) => d.key))
+      .range(d3.schemeCategory10);
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3.axisLeft(yScale);
     g.append('g').attr('class', 'x-axis').attr('transform', `translate(0, ${innerHeight})`).call(xAxis);
     g.append('g').attr('class', 'y-axis').call(yAxis);
     g.selectAll('rect')
       .data(data)
-      .enter()
-      .append('rect')
+      .join('rect')
       .attr('width', xScale.bandwidth())
-      .attr('x', (d) => xScale(d.area))
+      .attr('x', (d) => xScale(d.key))
       .attr('y', innerHeight)
-      .attr('fill', (d) => colorScale(d.area))
+      .attr('fill', (d) => colorScale(d.key))
       .transition()
       .duration(500)
-      .attr('y', (d) => yScale(d.amount))
-      .attr('height', (d) => yScale(0) - yScale(d.amount));
-    g.selectAll('amount-text')
+      .attr('y', (d) => yScale(d.value))
+      .attr('height', (d) => yScale(0) - yScale(d.value));
+    g.selectAll('.amount-text')
       .data(data)
       .enter()
       .append('text')
-      .text((d) => d.amount)
+      .text((d) => d.value)
       .attr('text-anchor', 'middle')
-      .attr('x', (d) => xScale(d.area) + xScale.bandwidth() / 2)
+      .attr('x', (d) => xScale(d.key) + xScale.bandwidth() / 2)
       .attr('y', innerHeight)
       .transition()
       .duration(500)
-      .attr('y', (d) => yScale(d.amount) - 8);
+      .attr('y', (d) => yScale(d.value) - 8);
     g.append('text')
-      .text('地區分布')
+      .text('年齡分布')
       .attr('x', innerWidth * 0.7)
       .attr('y', innerHeight * 0.2);
   }
   function renderInit() {
-    d3.select('.area svg').remove();
-    const margin = { top: 10, right: 10, bottom: 30, left: 40 };
-    const width = parseInt(d3.select('.area').style('width'));
+    d3.select('.age svg').remove();
+    const margin = { top: 30, right: 10, bottom: 30, left: 40 };
+    const width = parseInt(d3.select('.age').style('width'));
     const height = width * 0.9;
     innerWidth = width - margin.left - margin.right;
     innerHeight = height - margin.top - margin.bottom;
-    const svg = d3.select('.area').append('svg').attr('width', width).attr('height', height);
+    const svg = d3.select('.age').append('svg').attr('width', width).attr('height', height);
     const g = svg.append('g').attr('class', 'main-group').attr('transform', `translate(${margin.left},${margin.top})`);
     return g;
   }
-  return <div className='area'></div>;
+  return <div className='age'></div>;
 }
