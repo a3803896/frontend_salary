@@ -8,7 +8,8 @@ export default function Area({ originData }) {
   const [data, setData] = useState(null);
   // mounted
   useEffect(() => {
-    getData();
+    if (!originData.length) return;
+    formatData();
   }, [originData]);
   useEffect(() => {
     if (!data) return;
@@ -19,7 +20,7 @@ export default function Area({ originData }) {
     };
   }, [data]);
   // methods
-  async function getData() {
+  async function formatData() {
     const tempData = {};
     const data = [];
     const res = originData;
@@ -47,6 +48,10 @@ export default function Area({ originData }) {
       .domain([0, d3.max(data, (d) => d.amount)])
       .range([innerHeight, 0])
       .nice();
+    const colorScale = d3
+      .scaleOrdinal()
+      .domain(data.map((d) => d.area))
+      .range(d3.schemePastel1);
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3.axisLeft(yScale);
     g.append('g').attr('class', 'x-axis').attr('transform', `translate(0, ${innerHeight})`).call(xAxis);
@@ -58,6 +63,7 @@ export default function Area({ originData }) {
       .attr('width', xScale.bandwidth())
       .attr('x', (d) => xScale(d.area))
       .attr('y', innerHeight)
+      .attr('fill', (d) => colorScale(d.area))
       .transition()
       .duration(500)
       .attr('y', (d) => yScale(d.amount))

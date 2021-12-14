@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as d3 from 'd3';
 import Area from './components/Area';
+import Gender from './components/Gender';
 
 export default function App() {
   const [originData, setData] = useState([]);
@@ -12,6 +13,11 @@ export default function App() {
       <div className='row'>
         <div className='col-lg-7'>
           <Area originData={originData} />
+        </div>
+      </div>
+      <div className='row'>
+        <div className='col-lg-6'>
+          <Gender originData={originData} />
         </div>
       </div>
     </div>
