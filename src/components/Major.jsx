@@ -67,17 +67,11 @@ export default function Major({ originData }) {
         tip.style('top', `${y}px`);
       })
       .on('mouseout', tip.hide);
-    d3.select('.major svg')
-      .append('text')
-      .text('科系比例')
-      .attr('x', innerWidth / 2)
-      .attr('y', 50)
-      .attr('text-anchor', 'middle');
   }
   function renderInit() {
     d3.select('.major svg').remove();
     d3.selectAll('.d3-tip').remove();
-    const margin = { top: 66, right: 0, bottom: 0, left: 0 };
+    const margin = { top: 10, right: 10, bottom: 10, left: 10 };
     const width = parseInt(d3.select('.major').style('width'));
     const height = width;
     innerWidth = width - margin.left - margin.right;
@@ -86,12 +80,15 @@ export default function Major({ originData }) {
     const g = svg
       .append('g')
       .attr('class', 'main-group')
-      .attr('transform', `translate(${(width + margin.left) / 2},${(height + margin.top) / 2})`);
+      .attr('transform', `translate(${width / 2},${height / 2})`);
     return g;
   }
   return (
     <div>
-      <div className='major'></div>
+      <>
+        <p className='text-center mb-0'>科系分布</p>
+        <div className='major'></div>
+      </>
     </div>
   );
 }

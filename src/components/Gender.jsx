@@ -80,5 +80,10 @@ export default function Gender({ originData }) {
       .attr('transform', `translate(${width / 2},${height / 2})`);
     return g;
   }
-  return <div className='gender'></div>;
+  return (
+    <>
+      <p className='text-center mb-0'>性別分布</p>
+      <div className='gender'></div>
+    </>
+  );
 }

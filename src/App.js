@@ -4,6 +4,7 @@ import Area from './components/Area';
 import Gender from './components/Gender';
 import Age from './components/Age';
 import Major from './components/Major';
+import SalaryTenure from './components/SalaryTenure';
 
 export default function App() {
   const [originData, setData] = useState([]);
@@ -28,8 +29,13 @@ export default function App() {
         </div>
       </div>
       <div className='row'>
-        <div className='col-lg-7'>
+        <div className='col-lg-6'>
           <Major originData={originData} />
+        </div>
+      </div>
+      <div className='row'>
+        <div className='col-lg-7'>
+          <SalaryTenure originData={originData} />
         </div>
       </div>
     </div>
