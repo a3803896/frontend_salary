@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as d3 from 'd3';
+import d3Tip from 'd3-tip';
 
 export default function SalaryTenure({ originData }) {
   // data
@@ -50,8 +51,64 @@ export default function SalaryTenure({ originData }) {
     setData(sorted);
   }
   function draw() {
-    console.log(data);
     const g = renderInit();
+    const tip = d3Tip().attr('class', 'd3-tip');
+    tip.html(
+      (d) => `<div>
+                <p class="mb-1">年資：${d.key}</p>
+                <p class="mb-0">平均年薪：${d.value.toFixed(1)}萬</p>
+              </div>`
+    );
+    tip.offset([-4, 0]);
+    d3.select('svg').call(tip);
+    const xScale = d3
+      .scalePoint()
+      .domain(data.map((d) => d.key))
+      .rangeRound([0, innerWidth])
+      .padding(0.5);
+    const yScale = d3
+      .scaleLinear()
+      .domain(d3.extent(data, (d) => d.value))
+      .range([innerHeight, 0])
+      .nice();
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+    g.append('g').attr('class', 'x-axis').attr('transform', `translate(0,${innerHeight})`).call(xAxis);
+    g.append('g').attr('class', 'y-axis').call(yAxis);
+    // 畫線
+    const line = d3
+      .line()
+      .x((d) => xScale(d.key))
+      .y((d) => yScale(d.value));
+    g.append('path').attr('class', 'salary-path');
+    d3.select('.salary-path')
+      .datum(data)
+      .attr('stroke', '#FFC400')
+      .attr('stroke-width', '12')
+      .attr('fill', 'none')
+      .transition()
+      .duration(2000)
+      .attr('d', line)
+      .attr('stroke-linecap', 'round');
+    // 畫點
+    g.selectAll('.circle')
+      .data(data)
+      .join('circle')
+      .attr('cx', (d) => xScale(d.key))
+      .attr('cy', (d) => yScale(d.value) + 1)
+      .attr('r', '4')
+      .attr('fill', '#1FC1B8');
+    g.selectAll('.circle')
+      .data(data)
+      .join('circle')
+      .attr('cx', (d) => xScale(d.key))
+      .attr('cy', (d) => yScale(d.value))
+      .attr('r', '20')
+      .attr('fill', 'transparent')
+      .on('mouseover', function (event, data) {
+        tip.show(data, this);
+      })
+      .on('mouseout', tip.hide);
   }
   function renderInit() {
     d3.select('.tenure svg').remove();
