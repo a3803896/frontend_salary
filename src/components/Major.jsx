@@ -10,6 +10,7 @@ export default function Major({ originData }) {
   useEffect(() => {
     if (!originData.length) return;
     formatData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originData]);
   useEffect(() => {
     if (!data) return;
@@ -18,6 +19,7 @@ export default function Major({ originData }) {
     return () => {
       window.removeEventListener('resize', draw);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
   function formatData() {
     const tempObj = {};

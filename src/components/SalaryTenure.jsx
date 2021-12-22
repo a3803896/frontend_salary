@@ -11,6 +11,7 @@ export default function SalaryTenure({ originData }) {
   useEffect(() => {
     if (!originData.length) return;
     formatData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originData]);
   useEffect(() => {
     if (!data) return;
@@ -19,10 +20,12 @@ export default function SalaryTenure({ originData }) {
     return () => {
       window.removeEventListener('resize', draw);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
   // methods
   function formatData() {
-    const tempData = originData.filter((item) => item.company.salary && item.company.job_tenure);
+    const cloneData = JSON.parse(JSON.stringify(originData));
+    const tempData = cloneData.filter((item) => item.company.salary && item.company.job_tenure);
     const tempObj = {};
     const data = [];
     tempData.forEach((item) => {
