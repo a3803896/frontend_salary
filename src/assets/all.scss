@@ -12,3 +12,22 @@
 @import '~bootstrap/scss/utilities/api';
 
 @import 'd3-tip';
+
+body {
+  background: #292929;
+}
+.wrap {
+  height: 100vh;
+}
+.three-js {
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  width: 100%;
+  mix-blend-mode: screen;
+}
+h1 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 8em;
+  color: #fff;
+}

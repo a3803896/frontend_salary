@@ -2,84 +2,81 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import normalMap from '../assets/texture/NormalMap.png';
 
 export default function ThreeJs() {
   const threeRef = useRef();
-  const scene = useRef(null);
-  const camera = useRef(null);
-  const renderer = useRef(null);
-  const mesh = useRef(null);
-  const controls = useRef(null);
-  function setCanvasSize() {
-    renderer.current.setSize(threeRef.current.clientWidth, threeRef.current.clientWidth * 0.5625);
-  }
-  function init() {
-    const canvas = document.querySelector('canvas');
-    if (canvas) canvas.remove();
-    scene.current = new THREE.Scene();
-    camera.current = new THREE.PerspectiveCamera(75, 1.77, 0.1, 1000);
-    renderer.current = new THREE.WebGLRenderer({ antialias: true });
-    threeRef.current.appendChild(renderer.current.domElement);
-    renderer.current.setPixelRatio(window.devicePixelRatio);
-    camera.current.position.z = 5;
-    controls.current = new OrbitControls(camera.current, renderer.current.domElement);
-  }
-  function draw() {
-    const geometry = new THREE.PlaneGeometry(5, 5, 10, 10);
-    const material = new THREE.MeshPhongMaterial({ color: 0xee1111, side: 2, flatShading: true });
-    mesh.current = new THREE.Mesh(geometry, material);
-    const { array } = mesh.current.geometry.attributes.position;
-    for (let i = 2; i < array.length; i += 3) {
-      array[i] += Math.random();
-    }
-    scene.current.add(mesh.current);
-    renderer.current.render(scene.current, camera.current);
-    controls.current.addEventListener('change', () => {
-      renderer.current.render(scene.current, camera.current);
-    });
-    // window.requestAnimationFrame(animate);
-  }
-  function lightUp() {
-    const light1 = new THREE.DirectionalLight(0xffffff, 1);
-    light1.position.set(0, 0, 1);
-    scene.current.add(light1);
-
-    const light2 = new THREE.DirectionalLight(0xffffff, 1);
-    light2.position.set(0, 0, -1);
-    scene.current.add(light2);
-  }
-  function animate() {
-    if (!mesh.current) return;
-    window.requestAnimationFrame(animate);
-    renderer.current.render(scene.current, camera.current);
-    mesh.current.rotation.x += 0.01;
-  }
-  function change(data) {
-    mesh.current.geometry.dispose();
-    mesh.current.geometry = new THREE.PlaneGeometry(data.width, data.height, data.xFregment, data.yFregment);
-    const { array } = mesh.current.geometry.attributes.position;
-    for (let i = 2; i < array.length; i += 3) {
-      array[i] += Math.random();
-    }
-    scene.current.add(mesh.current);
-    renderer.current.render(scene.current, camera.current);
-  }
-  function createGUI() {
-    const gui = new dat.GUI();
-    const data = { width: 5, height: 5, xFregment: 10, yFregment: 10 };
-    gui.add(data, 'width', 1, 10).onChange(() => change(data));
-    gui.add(data, 'height', 1, 10).onChange(() => change(data));
-    gui.add(data, 'xFregment', 5, 25).onChange(() => change(data));
-    gui.add(data, 'yFregment', 5, 25).onChange(() => change(data));
-  }
 
   useEffect(() => {
-    init();
-    setCanvasSize();
-    window.addEventListener('resize', setCanvasSize);
-    lightUp();
-    draw();
-    createGUI();
+    // scene
+    const scene = new THREE.Scene();
+    // camera
+    const camera = new THREE.PerspectiveCamera(75, 16 / 9, 0.1, 1000);
+    camera.position.set(0, 0, 2);
+    scene.add(camera);
+    //renderer
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(threeRef.current.offsetWidth, threeRef.current.offsetWidth * 0.5625);
+    // loader
+    const loader = new THREE.TextureLoader();
+    const normalTexture = loader.load(normalMap, render);
+    // resize
+    window.addEventListener('resize', () => {
+      renderer.setSize(threeRef.current.offsetWidth, threeRef.current.offsetWidth * 0.5625);
+    });
+    // light
+    const pointLight2 = new THREE.PointLight(0xff0000, 1.6);
+    pointLight2.position.set(-2.59, 2.81, -1.5);
+    scene.add(pointLight2);
+    const pointLight3 = new THREE.PointLight(0x509b, 1.6);
+    pointLight3.position.set(3.36, -2.75, -0.97);
+    scene.add(pointLight3);
+    // geometry
+    const geometry = new THREE.SphereGeometry(0.5, 32, 16);
+    // material
+    const material = new THREE.MeshStandardMaterial({
+      metalness: 0.7,
+      roughness: 0.2,
+      normalMap: normalTexture,
+    });
+    material.color.set(0xffffff);
+    // mesh
+    const sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
+    // render
+    function render() {
+      renderer.render(scene, camera);
+    }
+    threeRef.current.appendChild(renderer.domElement);
+    render();
+    // animate
+    function scrollHandler() {
+      sphere.position.y = window.scrollY * 0.001;
+      sphere.position.z = window.scrollY * 0.0008;
+      sphere.rotation.x = window.scrollY * 0.0005;
+    }
+    function tick() {
+      sphere.rotation.y += 0.008;
+      renderer.render(scene, camera);
+      window.requestAnimationFrame(tick);
+    }
+    window.addEventListener('scroll', scrollHandler);
+    tick();
+    // // Debug
+    // const gui = new dat.GUI();
+    // const light3 = gui.addFolder('light 2');
+    // const light3Color = { color: 0xff0000 };
+    // light3.add(pointLight3.position, 'x', -6, 6, 0.01);
+    // light3.add(pointLight3.position, 'y', -3, 3, 0.01);
+    // light3.add(pointLight3.position, 'z', -3, 3, 0.01);
+    // light3.add(pointLight3, 'intensity', 0, 2, 0.01);
+    // light3.addColor(light3Color, 'color').onChange(() => {
+    //   pointLight3.color.set(light3Color.color);
+    // });
   }, []);
-  return <div ref={threeRef} className='three-js'></div>;
+  return <div ref={threeRef} className='three-js position-fixed'></div>;
 }

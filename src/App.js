@@ -16,10 +16,43 @@ export default function App() {
   return (
     <div className='container'>
       <div className='row justify-content-center'>
-        <div className='col-lg-11 pt-3'>
+        <div className='col-lg-12 position-relative'>
+          <div className='wrap d-flex align-items-center justify-content-center'>
+            <h1 className=''>FEEL THE SPHERE</h1>
+          </div>
           <ThreeJs />
         </div>
       </div>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
     </div>
     // <div className=''>
     //   <div className='row'>
