@@ -22,22 +22,22 @@ export default function App() {
           <ThreeJs />
         </div>
       </div>
-      <div className='row mb-4'>
+      <div className='row mb-5'>
         <div className='col-lg-7 mx-auto'>
           <Area originData={originData} />
         </div>
       </div>
-      <div className='row mb-4'>
+      <div className='row mb-5'>
         <div className='col-lg-6 mx-auto'>
           <Gender originData={originData} />
         </div>
       </div>
-      <div className='row mb-4'>
+      <div className='row mb-5'>
         <div className='col-lg-7 mx-auto'>
           <Age originData={originData} />
         </div>
       </div>
-      <div className='row mb-4'>
+      <div className='row mb-5'>
         <div className='col-lg-6 mx-auto'>
           <Major originData={originData} />
         </div>

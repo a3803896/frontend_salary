@@ -26,7 +26,13 @@ export default function ThreeJs() {
     const normalTexture = loader.load(normalMap, render);
     // resize
     window.addEventListener('resize', () => {
-      renderer.setSize(threeRef.current.offsetWidth, threeRef.current.offsetWidth * 0.5625);
+      setTimeout(() => {
+        camera.aspect = 16 / 9;
+        camera.updateProjectionMatrix();
+        renderer.setSize(threeRef.current.offsetWidth, threeRef.current.offsetWidth * 0.5625);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.render(scene, camera);
+      }, 0);
     });
     // light
     const pointLight2 = new THREE.PointLight(0xff0000, 1.6);
@@ -55,10 +61,13 @@ export default function ThreeJs() {
     render();
     // animate
     function scrollHandler() {
-      // sphere.position.y = window.scrollY * 0.001;
-      sphere.position.z = window.scrollY * 0.0003;
-      if (sphere.position.z >= 0.6) sphere.position.z = 0.6;
-      // sphere.rotation.x = window.scrollY * 0.0005;
+      if (window.innerWidth <= 996) {
+        sphere.position.z = window.scrollY * 0.0006;
+        if (sphere.position.z >= 1.1) sphere.position.z = 1.1;
+      } else {
+        sphere.position.z = window.scrollY * 0.0003;
+        if (sphere.position.z >= 0.6) sphere.position.z = 0.6;
+      }
     }
     function tick() {
       sphere.rotation.y += 0.008;

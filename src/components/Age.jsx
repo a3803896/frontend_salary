@@ -76,10 +76,6 @@ export default function Age({ originData }) {
       .transition()
       .duration(500)
       .attr('y', (d) => yScale(d.value) - 8);
-    g.append('text')
-      .text('年齡分布（人數 / 年齡）')
-      .attr('x', innerWidth * 0.7)
-      .attr('y', innerHeight * 0.2);
   }
   function renderInit() {
     d3.select('.age svg').remove();
@@ -92,5 +88,10 @@ export default function Age({ originData }) {
     const g = svg.append('g').attr('class', 'main-group').attr('transform', `translate(${margin.left},${margin.top})`);
     return g;
   }
-  return <div className='age'></div>;
+  return (
+    <>
+      <p className='chart_title text-center mb-0'>年齡分布（人數 / 年齡）</p>
+      <div className='age'></div>;
+    </>
+  );
 }

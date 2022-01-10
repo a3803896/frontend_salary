@@ -2,6 +2,7 @@
   z-index: -1;
 }
 .chart_title {
+  font-size: 18px;
   color: #fff;
 }
 .area,
@@ -16,5 +17,11 @@
     path {
       stroke: #fff;
     }
+  }
+}
+.x-axis,
+.y-axis {
+  text {
+    font-size: 14px;
   }
 }

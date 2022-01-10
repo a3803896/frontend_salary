@@ -81,10 +81,6 @@ export default function Area({ originData }) {
       .transition()
       .duration(500)
       .attr('y', (d) => yScale(d.amount) - 8);
-    g.append('text')
-      .text('地區分布（人數 / 地區）')
-      .attr('x', innerWidth * 0.7)
-      .attr('y', innerHeight * 0.2);
   }
   function renderInit() {
     d3.select('.area svg').remove();
@@ -97,5 +93,10 @@ export default function Area({ originData }) {
     const g = svg.append('g').attr('class', 'main-group').attr('transform', `translate(${margin.left},${margin.top})`);
     return g;
   }
-  return <div className='area'></div>;
+  return (
+    <>
+      <p className='chart_title text-center mb-0'>地區分布（人數 / 地區）</p>
+      <div className='area'></div>
+    </>
+  );
 }
