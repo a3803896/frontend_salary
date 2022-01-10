@@ -82,7 +82,7 @@ export default function Area({ originData }) {
       .duration(500)
       .attr('y', (d) => yScale(d.amount) - 8);
     g.append('text')
-      .text('地區分布')
+      .text('地區分布（人數 / 地區）')
       .attr('x', innerWidth * 0.7)
       .attr('y', innerHeight * 0.2);
   }

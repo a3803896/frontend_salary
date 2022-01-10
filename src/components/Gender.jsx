@@ -84,7 +84,7 @@ export default function Gender({ originData }) {
   }
   return (
     <>
-      <p className='text-center mb-0'>性別分布</p>
+      <p className='chart_title text-center mb-0'>性別分布（人數 / 性別）</p>
       <div className='gender'></div>
     </>
   );

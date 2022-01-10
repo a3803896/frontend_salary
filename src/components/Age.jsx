@@ -77,7 +77,7 @@ export default function Age({ originData }) {
       .duration(500)
       .attr('y', (d) => yScale(d.value) - 8);
     g.append('text')
-      .text('年齡分布')
+      .text('年齡分布（人數 / 年齡）')
       .attr('x', innerWidth * 0.7)
       .attr('y', innerHeight * 0.2);
   }

@@ -1,0 +1,20 @@
+.three-js {
+  z-index: -1;
+}
+.chart_title {
+  color: #fff;
+}
+.area,
+.age,
+.tenure {
+  text {
+    color: #fff;
+    fill: #fff;
+  }
+  .x-axis,
+  .y-axis {
+    path {
+      stroke: #fff;
+    }
+  }
+}

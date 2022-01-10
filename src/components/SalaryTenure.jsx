@@ -124,5 +124,11 @@ export default function SalaryTenure({ originData }) {
     const g = svg.append('g').attr('class', 'main-group').attr('transform', `translate(${margin.left},${margin.top})`);
     return g;
   }
-  return <div className='tenure'></div>;
+  return (
+    <>
+      <p className='chart_title text-center mb-0'>薪資分佈（薪資 / 年資）</p>
+      <p className='chart_title text-center mb-0'>有滑鼠 hover 效果</p>
+      <div className='tenure'></div>;
+    </>
+  );
 }

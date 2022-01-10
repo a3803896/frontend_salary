@@ -88,7 +88,8 @@ export default function Major({ originData }) {
   return (
     <div>
       <>
-        <p className='text-center mb-0'>科系分布</p>
+        <p className='chart_title text-center mb-0'>科系分布（人數 / 科系）</p>
+        <p className='chart_title text-center mb-0'>有滑鼠 hover 效果</p>
         <div className='major'></div>
       </>
     </div>

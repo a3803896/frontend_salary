@@ -55,9 +55,10 @@ export default function ThreeJs() {
     render();
     // animate
     function scrollHandler() {
-      sphere.position.y = window.scrollY * 0.001;
-      sphere.position.z = window.scrollY * 0.0008;
-      sphere.rotation.x = window.scrollY * 0.0005;
+      // sphere.position.y = window.scrollY * 0.001;
+      sphere.position.z = window.scrollY * 0.0003;
+      if (sphere.position.z >= 0.6) sphere.position.z = 0.6;
+      // sphere.rotation.x = window.scrollY * 0.0005;
     }
     function tick() {
       sphere.rotation.y += 0.008;
